@@ -111,7 +111,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Privacy Guardian API server running on port ${PORT}`);
+  console.log(`SecureHost API server running on port ${PORT}`);
 });
 
 module.exports = { db };

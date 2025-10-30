@@ -49,6 +49,35 @@ const DEFAULT_RULES = `
 
 const processedFiles = new Set();
 
+async function saveToDatabase(data, retryCount = 3) {
+  for (let i = 0; i < retryCount; i++) {
+    try {
+      const response = await fetch('http://localhost:3001/api/scan-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      });
+      
+      if (response.ok) {
+        return await response.json();
+      }
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    } catch (error) {
+      console.log(`💾 Database save attempt ${i + 1}/${retryCount} failed: ${error.message}`);
+      
+      if (i === retryCount - 1) {
+        console.error('❌ Failed to save to database after all retries. Data:', JSON.stringify(data, null, 2));
+        throw error;
+      }
+      
+      // Wait before retry (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, i)));
+    }
+  }
+}
+
 function isScreenshotFile(filePath) {
   const fileName = path.basename(filePath).toLowerCase();
   const ext = path.extname(fileName);
@@ -122,13 +151,8 @@ async function processScreenshot(filePath) {
       rules_text: DEFAULT_RULES
     };
     
-    await fetch('http://localhost:3001/api/scan-results', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(scanResult)
-    });
+    // Try to save to database with retry logic
+    await saveToDatabase(scanResult);
     
     console.log('✅ Queued for Pipelex analysis');
     
@@ -203,17 +227,10 @@ async function runPiplexAnalysis(screenshotPath, imageUrl, rulesText) {
             };
             
             try {
-              await fetch('http://localhost:3001/api/scan-results', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(result)
-              });
-              
+              await saveToDatabase(result);
               console.log('✅ Analysis result saved to database');
             } catch (fetchError) {
-              console.error('❌ Failed to save to database (API server may not be running):', fetchError.message);
+              console.error('❌ Failed to save to database after all retries:', fetchError.message);
               console.log('💾 Result data available locally in:', resultPath);
             }
           } else {
@@ -236,8 +253,29 @@ async function runPiplexAnalysis(screenshotPath, imageUrl, rulesText) {
   }
 }
 
-function startMonitoring() {
+async function waitForServer(maxRetries = 10) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const response = await fetch('http://localhost:3001/api/health');
+      if (response.ok) {
+        console.log('✅ API server is ready');
+        return true;
+      }
+    } catch (error) {
+      console.log(`⏳ Waiting for API server... (${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+  }
+  console.log('⚠️ API server not responding, continuing anyway...');
+  return false;
+}
+
+async function startMonitoring() {
   console.log('🔍 Starting screenshot monitoring...');
+  
+  // Wait for API server to be ready
+  await waitForServer();
+  
   console.log(`📁 Watching directories:`);
   WATCH_DIRS.forEach(dir => {
     if (fs.existsSync(dir)) {

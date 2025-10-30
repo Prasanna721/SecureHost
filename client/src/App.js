@@ -51,21 +51,6 @@ function App() {
     return new Date(timestamp).toLocaleString();
   };
 
-  const getClassificationClass = (classification) => {
-    if (!classification) return '';
-    const lower = classification.toLowerCase();
-    if (lower.includes('confidential')) return 'classification-confidential';
-    if (lower.includes('internal')) return 'classification-internal';
-    if (lower.includes('restricted')) return 'classification-restricted';
-    if (lower.includes('public')) return 'classification-public';
-    return '';
-  };
-
-  const getRatingClass = (rating) => {
-    if (rating >= 7) return 'rating-high';
-    if (rating >= 4) return 'rating-medium';
-    return 'rating-low';
-  };
 
   const getRatingColor = (rating) => {
     if (rating >= 7) return '#ef4444';
