@@ -1,5 +1,5 @@
 {
-  "name": "privacy-guardian-client",
+  "name": "securehost-client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

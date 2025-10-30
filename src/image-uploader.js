@@ -14,11 +14,11 @@ async function uploadToCloudinary(filePath) {
     console.log('   📤 Uploading to Cloudinary...');
     
     const result = await cloudinary.uploader.upload(filePath, {
-      folder: 'privacy-guardian', // Organize screenshots in a folder
+      folder: 'securehost', // Organize screenshots in a folder
       resource_type: 'image',
       public_id: `screenshot-${Date.now()}`, // Unique identifier
       overwrite: false,
-      tags: ['privacy-guardian', 'screenshot'] // Add tags for organization
+      tags: ['securehost', 'screenshot'] // Add tags for organization
     });
     
     if (result && result.secure_url) {

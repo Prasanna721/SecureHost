@@ -1,7 +1,7 @@
 {
-  "name": "privacy-guardian",
+  "name": "securehost",
   "version": "1.0.0",
-  "description": "Enterprise privacy application for screenshot analysis",
+  "description": "Enterprise security application for screenshot analysis",
   "main": "src/main.js",
   "scripts": {
     "dev": "concurrently \"npm run server\" \"npm run client\"",
