@@ -1,0 +1,12 @@
+{
+  "image": {
+    "concept": "native.Image",
+    "content": {
+      "url": "image_url"
+    }
+  },
+  "rules": {
+    "concept": "native.Text",
+    "content": "rules_text"
+  }
+}

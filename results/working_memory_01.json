@@ -1,0 +1,445 @@
+{
+    "root": {
+        "brief": {
+            "stuff_code": "KA4Uo",
+            "stuff_name": "brief",
+            "concept": {
+                "code": "Text",
+                "domain": "native",
+                "description": "A text",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "take a image and rules(text) as input, analyse the content of the image and compare with rules tell if its sensitive information, (public, internal, confidential, restrictive) give rating out of 10 sensitivity and should it be deleted and when should it be delted in strcutured form json"
+            }
+        },
+        "plan_draft": {
+            "stuff_code": "KkmZE",
+            "stuff_name": "plan_draft",
+            "concept": {
+                "code": "PlanDraft",
+                "domain": "builder",
+                "description": "Natural-language pipeline plan text describing sequences, inputs, outputs.",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "# Pipeline Plan\n\n## Initial Inputs\n- image\n- rules\n\n## Pipeline Structure\n\n### SEQUENCE\nExecutes the analysis and classification workflow.\n\n**Pipe 1: EXTRACT**\nExtracts text and visual content from the image for analysis.\n- Inputs: image\n- Output: extracted_pages\n\n**Pipe 2: LLM (analyze_image_content)**\nAnalyzes the visual and textual content of the image to identify what information is present.\n- Inputs: image, extracted_pages\n- Output: content_analysis\n\n**Pipe 3: LLM (classify_sensitivity)**\nCompares the content analysis against the rules to determine sensitivity classification, rating, and deletion recommendation. Uses structured output (JSON).\n- Inputs: content_analysis, rules\n- Output: sensitivity_assessment\n\nStructured output format for sensitivity_assessment:\n- classification (public/internal/confidential/restrictive)\n- sensitivity_rating (0-10)\n- should_be_deleted (boolean)\n- deletion_date (ISO date string or null)\n- reasoning (text explanation)"
+            }
+        },
+        "concept_drafts": {
+            "stuff_code": "gGnGD",
+            "stuff_name": "concept_drafts",
+            "concept": {
+                "code": "ConceptDrafts",
+                "domain": "builder",
+                "description": "Textual draft of the concepts to create.",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "### Concept SensitivityAssessment\n\nStructured evaluation of information sensitivity based on predefined rules.\n\n- classification\n  - description: The sensitivity level of the content\n  - type: text\n  - required: true\n\n- sensitivity_rating\n  - description: Numerical rating of sensitivity from 0 to 10\n  - type: integer\n  - required: true\n\n- should_be_deleted\n  - description: Whether the content should be deleted\n  - type: boolean\n  - required: true\n\n- deletion_date\n  - description: The date when the content should be deleted in ISO format\n  - type: date\n\n- reasoning\n  - description: Explanation for the sensitivity classification and deletion recommendation\n  - type: text\n  - required: true\n\n### Concept ContentAnalysis\n\nDescription of the information and elements identified within visual or textual content.\n\nrefines: Text"
+            }
+        },
+        "concept_specs": {
+            "stuff_code": "VLUZc",
+            "stuff_name": "concept_specs",
+            "concept": {
+                "code": "ConceptSpec",
+                "domain": "concept",
+                "description": "A specification for a concept including its code, description, and a structure draft as plain text.",
+                "structure_class_name": "ConceptSpec",
+                "refines": null
+            },
+            "content": {
+                "items": [
+                    {
+                        "the_concept_code": "SensitivityAssessment",
+                        "description": "Structured evaluation of information sensitivity based on predefined rules.",
+                        "structure": {
+                            "classification": {
+                                "the_field_name": "classification",
+                                "description": "The sensitivity level of the content",
+                                "type": "text",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "sensitivity_rating": {
+                                "the_field_name": "sensitivity_rating",
+                                "description": "Numerical rating of sensitivity from 0 to 10",
+                                "type": "integer",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "should_be_deleted": {
+                                "the_field_name": "should_be_deleted",
+                                "description": "Whether the content should be deleted",
+                                "type": "boolean",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "deletion_date": {
+                                "the_field_name": "deletion_date",
+                                "description": "The date when the content should be deleted in ISO format",
+                                "type": "date",
+                                "required": null,
+                                "default_value": null
+                            },
+                            "reasoning": {
+                                "the_field_name": "reasoning",
+                                "description": "Explanation for the sensitivity classification and deletion recommendation",
+                                "type": "text",
+                                "required": true,
+                                "default_value": null
+                            }
+                        },
+                        "refines": null
+                    },
+                    {
+                        "the_concept_code": "ContentAnalysis",
+                        "description": "Description of the information and elements identified within visual or textual content.",
+                        "structure": null,
+                        "refines": "Text"
+                    }
+                ]
+            }
+        },
+        "flow_draft": {
+            "stuff_code": "c8NYF",
+            "stuff_name": "flow_draft",
+            "concept": {
+                "code": "FlowDraft",
+                "domain": "builder",
+                "description": "Draft of the flow of the pipeline.",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "# Structured Pipeline Flow\n\n## Pipeline Initial Inputs\n- `image` (Image)\n- `rules` (Text)\n\n---\n\n## Pipe Definitions\n\n### Pipe 1: extract_image_content\n**Type:** PipeExtract\n\n**Description:** Extracts text and visual elements from the input image for content analysis.\n\n**Inputs:**\n- `image`: Image\n\n**Result:** `extracted_pages`\n\n**Output:** Page[]\n\n---\n\n### Pipe 2: analyze_image_content\n**Type:** PipeLLM\n\n**Description:** Analyzes the extracted content and visual elements to identify what information is present in the image.\n\n**Inputs:**\n- `image`: Image\n- `extracted_pages`: Page[]\n\n**Result:** `content_analysis`\n\n**Output:** ContentAnalysis\n\n---\n\n### Pipe 3: classify_sensitivity\n**Type:** PipeLLM\n\n**Description:** Compares the content analysis against the provided rules to determine sensitivity classification, rating, and deletion recommendation with structured JSON output.\n\n**Inputs:**\n- `content_analysis`: ContentAnalysis\n- `rules`: Text\n\n**Result:** `sensitivity_assessment`\n\n**Output:** SensitivityAssessment\n\n---\n\n### Main Pipe: assess_image_sensitivity\n**Type:** PipeSequence\n\n**Description:** # MAIN PIPE - Orchestrates the complete workflow to assess image sensitivity based on rules.\n\n**Inputs:**\n- `image`: Image\n- `rules`: Text\n\n**Result:** `sensitivity_assessment`\n\n**Output:** SensitivityAssessment\n\n**Steps:**\n1. `pipe`: extract_image_content, `result`: extracted_pages\n2. `pipe`: analyze_image_content, `result`: content_analysis\n3. `pipe`: classify_sensitivity, `result`: sensitivity_assessment\n\n---\n\n## Variables Recap\n\n| Variable Name | Description | Concept | Multiplicity | Refines |\n|---------------|-------------|---------|--------------|---------|\n| `image` | Input image to analyze | Image | Single | Native |\n| `rules` | Sensitivity classification rules | Text | Single | Native |\n| `extracted_pages` | Extracted text and visual elements | Page | Multiple [] | Native |\n| `content_analysis` | Description of identified information | ContentAnalysis | Single | Text |\n| `sensitivity_assessment` | Final structured sensitivity evaluation | SensitivityAssessment | Single | - |"
+            }
+        },
+        "prepared_flow": {
+            "stuff_code": "VooQB",
+            "stuff_name": "prepared_flow",
+            "concept": {
+                "code": "FlowDraft",
+                "domain": "builder",
+                "description": "Draft of the flow of the pipeline.",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "Let me narrate the flow step by step:\n\n## Flow Narration\n\n**Beginning:** The pipeline starts with two inputs - an `image` to be analyzed and `rules` (text) that define sensitivity criteria.\n\n**Step 1 (extract_image_content):** The image is processed through a PipeExtract to extract text and visual elements, producing `extracted_pages` (an array of Page objects).\n\n**Step 2 (analyze_image_content):** Both the original `image` and the `extracted_pages` are fed into a PipeLLM to analyze and identify what information is present, producing `content_analysis` (a ContentAnalysis object).\n\n**Step 3 (classify_sensitivity):** The `content_analysis` and the original `rules` are compared by a PipeLLM to determine the sensitivity classification (public/internal/confidential/restrictive), a rating out of 10, and deletion recommendations, producing the final `sensitivity_assessment` (a SensitivityAssessment object).\n\n**End:** The main pipe returns the `sensitivity_assessment` as structured JSON output.\n\n## Consistency Check\n\n\u2705 **Main pipe exists and is appropriate:** Yes, `assess_image_sensitivity` orchestrates the complete workflow to answer the brief.\n\n\u2705 **Main pipe inputs are consistent with brief:** The main pipe takes `image` and `rules` as inputs, which matches the brief exactly. Neither of these are generated by the flow itself.\n\n\u2705 **No batching issues:** Neither input is a list/multiple, so no batching concerns.\n\n\u2705 **Variable names and flow:** All variables are properly defined and flow logically through the pipeline.\n\n\u2705 **No PipeImgGen issues:** There is no PipeImgGen in this flow.\n\n\u2705 **Output matches brief requirements:** The final output is a structured SensitivityAssessment that should contain classification, rating, and deletion recommendation in JSON format.\n\n---\n\n**The flow has been checked and is consistent:**\n\n```\n# Structured Pipeline Flow\n\n## Pipeline Initial Inputs\n- `image` (Image)\n- `rules` (Text)\n\n---\n\n## Pipe Definitions\n\n### Pipe 1: extract_image_content\n**Type:** PipeExtract\n\n**Description:** Extracts text and visual elements from the input image for content analysis.\n\n**Inputs:**\n- `image`: Image\n\n**Result:** `extracted_pages`\n\n**Output:** Page[]\n\n---\n\n### Pipe 2: analyze_image_content\n**Type:** PipeLLM\n\n**Description:** Analyzes the extracted content and visual elements to identify what information is present in the image.\n\n**Inputs:**\n- `image`: Image\n- `extracted_pages`: Page[]\n\n**Result:** `content_analysis`\n\n**Output:** ContentAnalysis\n\n---\n\n### Pipe 3: classify_sensitivity\n**Type:** PipeLLM\n\n**Description:** Compares the content analysis against the provided rules to determine sensitivity classification, rating, and deletion recommendation with structured JSON output.\n\n**Inputs:**\n- `content_analysis`: ContentAnalysis\n- `rules`: Text\n\n**Result:** `sensitivity_assessment`\n\n**Output:** SensitivityAssessment\n\n---\n\n### Main Pipe: assess_image_sensitivity\n**Type:** PipeSequence\n\n**Description:** # MAIN PIPE - Orchestrates the complete workflow to assess image sensitivity based on rules.\n\n**Inputs:**\n- `image`: Image\n- `rules`: Text\n\n**Result:** `sensitivity_assessment`\n\n**Output:** SensitivityAssessment\n\n**Steps:**\n1. `pipe`: extract_image_content, `result`: extracted_pages\n2. `pipe`: analyze_image_content, `result`: content_analysis\n3. `pipe`: classify_sensitivity, `result`: sensitivity_assessment\n\n---\n\n## Variables Recap\n\n| Variable Name | Description | Concept | Multiplicity | Refines |\n|---------------|-------------|---------|--------------|---------|\n| `image` | Input image to analyze | Image | Single | Native |\n| `rules` | Sensitivity classification rules | Text | Single | Native |\n| `extracted_pages` | Extracted text and visual elements | Page | Multiple [] | Native |\n| `content_analysis` | Description of identified information | ContentAnalysis | Single | Text |\n| `sensitivity_assessment` | Final structured sensitivity evaluation | SensitivityAssessment | Single | - |\n```"
+            }
+        },
+        "pipe_signatures": {
+            "stuff_code": "RXDVk",
+            "stuff_name": "pipe_signatures",
+            "concept": {
+                "code": "PipeSignature",
+                "domain": "pipe_design",
+                "description": "A pipe contract which says what the pipe does, not how it does it: code (the pipe code in snake_case), type, description, inputs, output.",
+                "structure_class_name": "PipeSignature",
+                "refines": null
+            },
+            "content": {
+                "items": [
+                    {
+                        "code": "extract_image_content",
+                        "type": "PipeExtract",
+                        "pipe_category": "PipeOperator",
+                        "description": "Extracts text and visual elements from the input image for content analysis.",
+                        "inputs": {
+                            "image": "Image"
+                        },
+                        "result": "extracted_pages",
+                        "output": "Page[]",
+                        "pipe_dependencies": []
+                    },
+                    {
+                        "code": "analyze_image_content",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Analyzes the extracted content and visual elements to identify what information is present in the image.",
+                        "inputs": {
+                            "image": "Image",
+                            "extracted_pages": "Page[]"
+                        },
+                        "result": "content_analysis",
+                        "output": "ContentAnalysis",
+                        "pipe_dependencies": []
+                    },
+                    {
+                        "code": "classify_sensitivity",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Compares the content analysis against the provided rules to determine sensitivity classification (public, internal, confidential, restrictive), rating out of 10, and deletion recommendation with structured JSON output.",
+                        "inputs": {
+                            "content_analysis": "ContentAnalysis",
+                            "rules": "Text"
+                        },
+                        "result": "sensitivity_assessment",
+                        "output": "SensitivityAssessment",
+                        "pipe_dependencies": []
+                    },
+                    {
+                        "code": "assess_image_sensitivity",
+                        "type": "PipeSequence",
+                        "pipe_category": "PipeController",
+                        "description": "MAIN PIPE - Orchestrates the complete workflow to assess image sensitivity based on rules, analyzing content and comparing against sensitivity criteria to produce a structured assessment with classification, rating, and deletion recommendations.",
+                        "inputs": {
+                            "image": "Image",
+                            "rules": "Text"
+                        },
+                        "result": "sensitivity_assessment",
+                        "output": "SensitivityAssessment",
+                        "pipe_dependencies": [
+                            "extract_image_content",
+                            "analyze_image_content",
+                            "classify_sensitivity"
+                        ]
+                    }
+                ]
+            }
+        },
+        "bundle_header_spec": {
+            "stuff_code": "KFnTE",
+            "stuff_name": "bundle_header_spec",
+            "concept": {
+                "code": "BundleHeaderSpec",
+                "domain": "builder",
+                "description": "A domain information object.",
+                "structure_class_name": "BundleHeaderSpec",
+                "refines": null
+            },
+            "content": {
+                "domain": "image_sensitivity_assessment",
+                "description": "Assessing image content sensitivity against rules to determine classification, rating, and deletion recommendations.",
+                "system_prompt": null,
+                "main_pipe": "assess_image_sensitivity"
+            }
+        },
+        "pipe_specs": {
+            "stuff_code": "635t5",
+            "stuff_name": "pipe_specs",
+            "concept": {
+                "code": "Anything",
+                "domain": "native",
+                "description": "Anything",
+                "structure_class_name": "AnythingContent",
+                "refines": null
+            },
+            "content": {
+                "items": [
+                    {
+                        "pipe_code": "extract_image_content",
+                        "type": "PipeExtract",
+                        "pipe_category": "PipeOperator",
+                        "description": "Extracts text and visual elements from the input image for content analysis.",
+                        "inputs": {
+                            "image": "Image"
+                        },
+                        "output": "Page[]",
+                        "extract_skill": "extract_text_from_visuals",
+                        "page_images": true,
+                        "page_image_captions": true,
+                        "page_views": null
+                    },
+                    {
+                        "pipe_code": "analyze_image_content",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Analyzes the extracted content and visual elements to identify what information is present in the image.",
+                        "inputs": {
+                            "image": "Image",
+                            "extracted_pages": "Page[]"
+                        },
+                        "output": "ContentAnalysis",
+                        "llm_skill": "llm_for_visual_analysis",
+                        "system_prompt": "You are an expert content analyst. Your task is to analyze visual and textual content to produce a structured ContentAnalysis describing what information is present.",
+                        "prompt": "Analyze the following image and its extracted content to identify what information is present.\n\n$image\n\n@extracted_pages\n\nProvide a comprehensive analysis of the content, including:\n- What types of information are visible\n- Key textual elements and their significance\n- Visual elements and their purpose\n- Overall context and subject matter\n\nBe thorough and descriptive in your analysis."
+                    },
+                    {
+                        "pipe_code": "classify_sensitivity",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Compares the content analysis against the provided rules to determine sensitivity classification (public, internal, confidential, restrictive), rating out of 10, and deletion recommendation with structured JSON output.",
+                        "inputs": {
+                            "content_analysis": "ContentAnalysis",
+                            "rules": "Text"
+                        },
+                        "output": "SensitivityAssessment",
+                        "llm_skill": "llm_to_answer_hard_questions",
+                        "system_prompt": "You are an expert in information security and data classification. Your task is to evaluate content and determine its sensitivity level based on provided rules. You will generate a structured assessment.",
+                        "prompt": "Based on the content analysis and the classification rules provided, determine the sensitivity classification of the content.\n\n@content_analysis\n\n@rules\n\nEvaluate the content against the rules and provide a comprehensive sensitivity assessment."
+                    },
+                    {
+                        "pipe_code": "assess_image_sensitivity",
+                        "type": "PipeSequence",
+                        "pipe_category": "PipeController",
+                        "description": "MAIN PIPE - Orchestrates the complete workflow to assess image sensitivity based on rules, analyzing content and comparing against sensitivity criteria to produce a structured assessment with classification, rating, and deletion recommendations.",
+                        "inputs": {
+                            "image": "Image",
+                            "rules": "Text"
+                        },
+                        "output": "SensitivityAssessment",
+                        "steps": [
+                            {
+                                "pipe_code": "extract_image_content",
+                                "result": "extracted_pages"
+                            },
+                            {
+                                "pipe_code": "analyze_image_content",
+                                "result": "content_analysis"
+                            },
+                            {
+                                "pipe_code": "classify_sensitivity",
+                                "result": "sensitivity_assessment"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "pipelex_bundle_spec": {
+            "stuff_code": "HwAUb",
+            "stuff_name": "pipelex_bundle_spec",
+            "concept": {
+                "code": "PipelexBundleSpec",
+                "domain": "builder",
+                "description": "A Pipelex bundle spec.",
+                "structure_class_name": "PipelexBundleSpec",
+                "refines": null
+            },
+            "content": {
+                "domain": "image_sensitivity_assessment",
+                "description": "Assessing image content sensitivity against rules to determine classification, rating, and deletion recommendations.",
+                "system_prompt": null,
+                "main_pipe": "assess_image_sensitivity",
+                "concept": {
+                    "SensitivityAssessment": {
+                        "the_concept_code": "SensitivityAssessment",
+                        "description": "Structured evaluation of information sensitivity based on predefined rules.",
+                        "structure": {
+                            "classification": {
+                                "the_field_name": "classification",
+                                "description": "The sensitivity level of the content",
+                                "type": "text",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "sensitivity_rating": {
+                                "the_field_name": "sensitivity_rating",
+                                "description": "Numerical rating of sensitivity from 0 to 10",
+                                "type": "integer",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "should_be_deleted": {
+                                "the_field_name": "should_be_deleted",
+                                "description": "Whether the content should be deleted",
+                                "type": "boolean",
+                                "required": true,
+                                "default_value": null
+                            },
+                            "deletion_date": {
+                                "the_field_name": "deletion_date",
+                                "description": "The date when the content should be deleted in ISO format",
+                                "type": "date",
+                                "required": null,
+                                "default_value": null
+                            },
+                            "reasoning": {
+                                "the_field_name": "reasoning",
+                                "description": "Explanation for the sensitivity classification and deletion recommendation",
+                                "type": "text",
+                                "required": true,
+                                "default_value": null
+                            }
+                        },
+                        "refines": null
+                    },
+                    "ContentAnalysis": {
+                        "the_concept_code": "ContentAnalysis",
+                        "description": "Description of the information and elements identified within visual or textual content.",
+                        "structure": null,
+                        "refines": "Text"
+                    }
+                },
+                "pipe": {
+                    "extract_image_content": {
+                        "pipe_code": "extract_image_content",
+                        "type": "PipeExtract",
+                        "pipe_category": "PipeOperator",
+                        "description": "Extracts text and visual elements from the input image for content analysis.",
+                        "inputs": {
+                            "image": "Image"
+                        },
+                        "output": "Page[]",
+                        "extract_skill": "extract_text_from_visuals",
+                        "page_images": true,
+                        "page_image_captions": true,
+                        "page_views": null
+                    },
+                    "analyze_image_content": {
+                        "pipe_code": "analyze_image_content",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Analyzes the extracted content and visual elements to identify what information is present in the image.",
+                        "inputs": {
+                            "image": "Image",
+                            "extracted_pages": "Page[]"
+                        },
+                        "output": "ContentAnalysis",
+                        "llm_skill": "llm_for_visual_analysis",
+                        "system_prompt": "You are an expert content analyst. Your task is to analyze visual and textual content to produce a structured ContentAnalysis describing what information is present.",
+                        "prompt": "Analyze the following image and its extracted content to identify what information is present.\n\n$image\n\n@extracted_pages\n\nProvide a comprehensive analysis of the content, including:\n- What types of information are visible\n- Key textual elements and their significance\n- Visual elements and their purpose\n- Overall context and subject matter\n\nBe thorough and descriptive in your analysis."
+                    },
+                    "classify_sensitivity": {
+                        "pipe_code": "classify_sensitivity",
+                        "type": "PipeLLM",
+                        "pipe_category": "PipeOperator",
+                        "description": "Compares the content analysis against the provided rules to determine sensitivity classification (public, internal, confidential, restrictive), rating out of 10, and deletion recommendation with structured JSON output.",
+                        "inputs": {
+                            "content_analysis": "ContentAnalysis",
+                            "rules": "Text"
+                        },
+                        "output": "SensitivityAssessment",
+                        "llm_skill": "llm_to_answer_hard_questions",
+                        "system_prompt": "You are an expert in information security and data classification. Your task is to evaluate content and determine its sensitivity level based on provided rules. You will generate a structured assessment.",
+                        "prompt": "Based on the content analysis and the classification rules provided, determine the sensitivity classification of the content.\n\n@content_analysis\n\n@rules\n\nEvaluate the content against the rules and provide a comprehensive sensitivity assessment."
+                    },
+                    "assess_image_sensitivity": {
+                        "pipe_code": "assess_image_sensitivity",
+                        "type": "PipeSequence",
+                        "pipe_category": "PipeController",
+                        "description": "MAIN PIPE - Orchestrates the complete workflow to assess image sensitivity based on rules, analyzing content and comparing against sensitivity criteria to produce a structured assessment with classification, rating, and deletion recommendations.",
+                        "inputs": {
+                            "image": "Image",
+                            "rules": "Text"
+                        },
+                        "output": "SensitivityAssessment",
+                        "steps": [
+                            {
+                                "pipe_code": "extract_image_content",
+                                "result": "extracted_pages"
+                            },
+                            {
+                                "pipe_code": "analyze_image_content",
+                                "result": "content_analysis"
+                            },
+                            {
+                                "pipe_code": "classify_sensitivity",
+                                "result": "sensitivity_assessment"
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "aliases": {
+        "main_stuff": "pipelex_bundle_spec"
+    }
+}
