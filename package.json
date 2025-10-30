@@ -18,7 +18,10 @@
     "chokidar": "^3.5.3",
     "screenshot-desktop": "^1.12.7",
     "node-cron": "^3.0.3",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "form-data": "^4.0.0",
+    "axios": "^1.6.0",
+    "cloudinary": "^1.41.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",

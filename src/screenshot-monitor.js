@@ -1,11 +1,16 @@
-const screenshot = require('screenshot-desktop');
+const chokidar = require('chokidar');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { v4: uuidv4 } = require('uuid');
 const { exec } = require('child_process');
+const { uploadScreenshot } = require('./image-uploader');
 
 const UPLOAD_DIR = path.join(__dirname, '../uploads');
-const SCREENSHOT_INTERVAL = 5000; // Check every 5 seconds
+const WATCH_DIRS = [
+  path.join(os.homedir(), 'Desktop'),
+  path.join(os.homedir(), 'Downloads')
+];
 
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
@@ -42,37 +47,78 @@ const DEFAULT_RULES = `
 - Public social media content
 `;
 
-let lastScreenshotTime = 0;
-let isProcessing = false;
+const processedFiles = new Set();
 
-async function captureAndAnalyze() {
-  if (isProcessing) {
+function isScreenshotFile(filePath) {
+  const fileName = path.basename(filePath).toLowerCase();
+  const ext = path.extname(fileName);
+  
+  // Check for common screenshot file patterns
+  const screenshotPatterns = [
+    /^screenshot/i,
+    /^screen shot/i,
+    /^capture/i,
+    /^screen_recording/i,
+    /^screen recording/i,
+    /^cleanshot/i,
+    /^\d{4}-\d{2}-\d{2} at \d/i, // macOS screenshot format
+    /^screenshot \d{4}-\d{2}-\d{2}/i
+  ];
+  
+  const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.tiff'];
+  
+  return imageExtensions.includes(ext) && 
+         screenshotPatterns.some(pattern => pattern.test(fileName));
+}
+
+async function processScreenshot(filePath) {
+  if (processedFiles.has(filePath)) {
     return;
   }
   
-  isProcessing = true;
-  
   try {
-    const img = await screenshot({ format: 'png' });
-    const timestamp = Date.now();
+    // Wait a moment for the file to be fully written
+    await new Promise(resolve => setTimeout(resolve, 1000));
     
-    if (timestamp - lastScreenshotTime < 2000) {
-      isProcessing = false;
+    if (!fs.existsSync(filePath)) {
+      console.log(`File no longer exists: ${filePath}`);
       return;
     }
     
-    const filename = `screenshot-${uuidv4()}-${timestamp}.png`;
-    const filePath = path.join(UPLOAD_DIR, filename);
-    const imageUrl = `http://localhost:3001/uploads/${filename}`;
+    const stats = fs.statSync(filePath);
+    if (stats.size === 0) {
+      console.log(`File is empty, skipping: ${filePath}`);
+      return;
+    }
     
-    fs.writeFileSync(filePath, img);
-    lastScreenshotTime = timestamp;
+    processedFiles.add(filePath);
     
-    console.log(`Screenshot captured: ${filename}`);
+    // Copy the screenshot to our uploads directory
+    const timestamp = Date.now();
+    const originalName = path.basename(filePath);
+    const ext = path.extname(originalName);
+    const newFilename = `user-screenshot-${uuidv4()}-${timestamp}${ext}`;
+    const newFilePath = path.join(UPLOAD_DIR, newFilename);
+    
+    fs.copyFileSync(filePath, newFilePath);
+    
+    console.log(`📸 Screenshot detected: ${originalName}`);
+    console.log(`   Copied to: ${newFilename}`);
+    
+    // Upload to public hosting service
+    let publicImageUrl;
+    try {
+      publicImageUrl = await uploadScreenshot(newFilePath);
+      console.log(`🌐 Public URL: ${publicImageUrl}`);
+    } catch (uploadError) {
+      console.error('❌ Failed to upload screenshot:', uploadError.message);
+      console.log('📝 Falling back to local URL (analysis may fail)');
+      publicImageUrl = `http://localhost:3001/uploads/${newFilename}`;
+    }
     
     const scanResult = {
-      screenshot_path: filePath,
-      image_url: imageUrl,
+      screenshot_path: newFilePath,
+      image_url: publicImageUrl,
       rules_text: DEFAULT_RULES
     };
     
@@ -84,14 +130,12 @@ async function captureAndAnalyze() {
       body: JSON.stringify(scanResult)
     });
     
-    console.log('Queued for Pipelex analysis');
+    console.log('✅ Queued for Pipelex analysis');
     
-    await runPiplexAnalysis(filePath, imageUrl, DEFAULT_RULES);
+    await runPiplexAnalysis(newFilePath, publicImageUrl, DEFAULT_RULES);
     
   } catch (error) {
-    console.error('Error capturing screenshot:', error);
-  } finally {
-    isProcessing = false;
+    console.error('❌ Error processing screenshot:', error);
   }
 }
 
@@ -169,14 +213,46 @@ async function runPiplexAnalysis(screenshotPath, imageUrl, rulesText) {
 }
 
 function startMonitoring() {
-  console.log('Starting screenshot monitoring...');
-  console.log(`Screenshots will be saved to: ${UPLOAD_DIR}`);
+  console.log('🔍 Starting screenshot monitoring...');
+  console.log(`📁 Watching directories:`);
+  WATCH_DIRS.forEach(dir => {
+    if (fs.existsSync(dir)) {
+      console.log(`   ✅ ${dir}`);
+    } else {
+      console.log(`   ❌ ${dir} (does not exist)`);
+    }
+  });
+  console.log(`💾 Screenshots will be copied to: ${UPLOAD_DIR}`);
   
-  setInterval(captureAndAnalyze, SCREENSHOT_INTERVAL);
+  const watcher = chokidar.watch(WATCH_DIRS, {
+    ignored: /(^|[\/\\])\../, // ignore dotfiles
+    persistent: true,
+    ignoreInitial: true, // don't process existing files
+    awaitWriteFinish: {
+      stabilityThreshold: 1000,
+      pollInterval: 100
+    }
+  });
+
+  watcher
+    .on('add', (filePath) => {
+      if (isScreenshotFile(filePath)) {
+        console.log(`🆕 New file detected: ${path.basename(filePath)}`);
+        processScreenshot(filePath);
+      }
+    })
+    .on('ready', () => {
+      console.log('🎯 Screenshot monitor ready! Take a screenshot and see it analyzed...');
+    })
+    .on('error', (error) => {
+      console.error('❌ Watcher error:', error);
+    });
+
+  return watcher;
 }
 
 if (require.main === module) {
   startMonitoring();
 }
 
-module.exports = { captureAndAnalyze, startMonitoring };
+module.exports = { processScreenshot, startMonitoring };

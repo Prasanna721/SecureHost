@@ -32,20 +32,20 @@ Employees routinely bypass all these protections by:
 - Sharing through Slack, email, and ticketing systems
 - Creating an invisible security risk
 
-## Solution Architecture
+## Current Solution Architecture
 
-### High-Level Flow
+### User Flow
 ```
-Screenshot Capture → Pipelex Analysis → Database Storage → React Dashboard
+User Takes Screenshot → File Watcher Detects → Pipelex Analysis → Database Storage → React Dashboard
 ```
 
 ### Implementation Architecture
 
 ```
 ┌─────────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   Screenshot        │    │    Pipelex       │    │   SQLite        │
-│   Monitor           │───▶│    Workflow      │───▶│   Database      │
-│   (Node.js)         │    │   scan_image.plx │    │                 │
+│   File Watcher      │    │    Pipelex       │    │   SQLite        │
+│   (~/Desktop/       │───▶│    Workflow      │───▶│   Database      │
+│    ~/Downloads/)    │    │   scan_image.plx │    │                 │
 └─────────────────────┘    └──────────────────┘    └─────────────────┘
                                                            │
 ┌─────────────────────┐    ┌──────────────────┐           │
@@ -65,12 +65,18 @@ Screenshot Capture → Pipelex Analysis → Database Storage → React Dashboard
 
 ### Core Components
 
-#### 1. Screenshot Monitor (`src/screenshot-monitor.js`)
-- **Purpose**: Automated screenshot capture and processing pipeline
-- **Frequency**: Every 5 seconds
+#### 1. Screenshot File Watcher (`src/screenshot-monitor.js`)
+- **Purpose**: Monitors user screenshot activity and triggers analysis
+- **Watch Directories**: 
+  - `~/Desktop/`
+  - `~/Downloads/`
+- **Smart Detection**: Recognizes screenshot files by patterns:
+  - `Screenshot 2024-10-30 at...` (macOS default)
+  - `screenshot-...`, `capture-...`, `cleanshot-...`
+  - Common screenshot naming conventions
 - **Process**:
-  1. Capture desktop screenshot using `screenshot-desktop`
-  2. Save to `uploads/` directory with UUID filename
+  1. File watcher detects new screenshot files
+  2. Copy screenshot to app's `uploads/` directory
   3. Create database record with status 'pending'
   4. Execute Pipelex workflow with screenshot and rules
   5. Parse workflow results and update database
@@ -144,20 +150,21 @@ Screenshot Capture → Pipelex Analysis → Database Storage → React Dashboard
 ### Data Flow
 
 #### Screenshot Processing Pipeline
-1. **Capture**: Screenshot taken every 5 seconds
-2. **Storage**: Saved to `uploads/` with UUID filename  
-3. **Queuing**: Database record created with 'pending' status
-4. **Analysis**: Pipelex workflow executed with:
+1. **User Action**: User takes screenshot using system tools (Cmd+Shift+3/4/5, etc.)
+2. **Detection**: File watcher detects new screenshot in monitored directories
+3. **Copy**: Screenshot copied to app's `uploads/` directory with UUID filename
+4. **Queuing**: Database record created with 'pending' status
+5. **Analysis**: Pipelex workflow executed with:
    - Screenshot image URL
    - Privacy classification rules
-5. **Results**: Structured output containing:
+6. **Results**: Structured output containing:
    - Classification level (Public/Internal/Restricted/Confidential)
    - Sensitivity rating (0-10)
    - Deletion recommendation (boolean)
    - Reasoning explanation
    - Scheduled deletion date
-6. **Update**: Database record updated with analysis results
-7. **Display**: React dashboard shows real-time results
+7. **Update**: Database record updated with analysis results
+8. **Display**: React dashboard shows real-time results
 
 #### Privacy Rules Engine
 Built-in classification rules covering:
@@ -172,7 +179,7 @@ Built-in classification rules covering:
 privacy-guardian/
 ├── src/
 │   ├── server.js              # Express API server
-│   ├── screenshot-monitor.js  # Screenshot capture + Pipelex
+│   ├── screenshot-monitor.js  # File watcher + Pipelex
 │   └── delete-scheduler.js    # Deletion policies (scaffolding)
 ├── client/                    # React frontend app
 │   ├── public/
@@ -197,7 +204,7 @@ privacy-guardian/
 **Backend:**
 - Node.js + Express.js (API server)
 - SQLite (lightweight database)
-- screenshot-desktop (cross-platform capture)
+- Chokidar (file watching)
 - node-cron (scheduled tasks)
 
 **Frontend:**
@@ -221,17 +228,25 @@ privacy-guardian/
 2. `cd client && npm install` - Install React dependencies  
 3. `source .venv/bin/activate` - Activate Python environment
 4. `pipelex validate results/scan_image.plx` - Verify workflow
-5. `npm run dev` - Start all services
+5. `npm run dev` - Start API server and React client
+6. `npm run screenshot-monitor` - Start file watcher (separate terminal)
 
 ### Process Management
 - API Server: Port 3001 (Express.js)
 - React Client: Port 3000 (Development server)
-- Screenshot Monitor: Background process
+- Screenshot Monitor: File watcher process
 - Database: SQLite file-based storage
+
+### Usage Flow
+1. Start all services
+2. Take screenshots using normal system tools
+3. File watcher automatically detects and processes them
+4. View analysis results in React dashboard at http://localhost:3000
+5. Monitor sensitivity classifications and deletion recommendations
 
 ### Monitoring & Observability
 - Health check endpoint: `GET /api/health`
-- Console logging for all operations
+- Console logging for all file detection and processing
 - Real-time dashboard updates
 - Error handling and recovery
 
@@ -256,6 +271,7 @@ privacy-guardian/
 - Local file storage (no cloud exposure)
 - SQLite database (no network access)
 - HTTP API (development only)
+- File watching limited to user directories
 
 ### Production Hardening (Future)
 - HTTPS encryption
@@ -265,4 +281,4 @@ privacy-guardian/
 - Network access controls
 - Audit logging
 
-This MVP provides a solid foundation for enterprise screenshot security monitoring while maintaining simplicity and modularity for future enhancements.
+This MVP provides a foundation for enterprise screenshot security monitoring that respects user workflow while maintaining comprehensive analysis capabilities.

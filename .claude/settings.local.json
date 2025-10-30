@@ -3,7 +3,8 @@
   "permissions": {
     "allow": [
       "Bash(npx create-react-app:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "WebFetch(domain:cloudinary.com)"
     ],
     "deny": []
   }

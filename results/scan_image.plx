@@ -32,20 +32,19 @@ steps = [
 ]
 
 [pipe.extract_image_content]
-type = "PipeExtract"
+type = "PipeLLM"
 description = "Extracts text and visual elements from the input image for content analysis."
 inputs = { image = "Image" }
-output = "Page[]"
-model = "extract_text_from_visuals"
-page_images = true
-page_image_captions = true
+output = "Text"
+model = "llm_for_visual_analysis"
+prompt = "Extract the text from the image: $image"
 
 [pipe.analyze_image_content]
 type = "PipeLLM"
 description = """
 Analyzes the extracted content and visual elements to identify what information is present in the image.
 """
-inputs = { image = "Image", extracted_pages = "Page[]" }
+inputs = { image = "Image", extracted_pages = "Text" }
 output = "ContentAnalysis"
 model = "llm_for_visual_analysis"
 system_prompt = """

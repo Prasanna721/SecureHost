@@ -2,11 +2,11 @@
   "image": {
     "concept": "native.Image",
     "content": {
-      "url": "image_url"
+      "url": "https://res.cloudinary.com/douei524x/image/upload/v1761795591/privacy-guardian/screenshot-1761795590020.png"
     }
   },
   "rules": {
     "concept": "native.Text",
-    "content": "rules_text"
+    "content": "\n# Privacy Classification Rules\n\n## CONFIDENTIAL (Rating 8-10)\n- API keys, passwords, tokens, certificates\n- Customer personal data (SSN, credit cards, addresses)\n- Financial data, salary information\n- Medical records, HIPAA protected data\n- Legal documents, contracts\n- Internal company strategies, unreleased products\n\n## INTERNAL (Rating 5-7)\n- Employee directories, org charts\n- Internal system screenshots, dashboards\n- Company financial reports (non-public)\n- Internal project timelines, roadmaps\n- Customer lists, business contacts\n\n## RESTRICTED (Rating 3-4)\n- Source code, architecture diagrams\n- Database schemas, system configurations\n- Training materials, internal processes\n- Performance data, metrics\n\n## PUBLIC (Rating 0-2)\n- Marketing materials, public websites\n- Published documentation\n- General business information\n- Public social media content\n"
   }
 }

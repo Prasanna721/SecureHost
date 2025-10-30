@@ -1,0 +1,89 @@
+{
+    "root": {
+        "image": {
+            "stuff_code": "ZQbDE",
+            "stuff_name": "image",
+            "concept": {
+                "code": "Image",
+                "domain": "native",
+                "description": "An image",
+                "structure_class_name": "ImageContent",
+                "refines": null
+            },
+            "content": {
+                "url": "https://res.cloudinary.com/douei524x/image/upload/v1761795591/privacy-guardian/screenshot-1761795590020.png",
+                "source_prompt": null,
+                "caption": null,
+                "base_64": null
+            }
+        },
+        "rules": {
+            "stuff_code": "5SXoq",
+            "stuff_name": "rules",
+            "concept": {
+                "code": "Text",
+                "domain": "native",
+                "description": "A text",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "\n# Privacy Classification Rules\n\n## CONFIDENTIAL (Rating 8-10)\n- API keys, passwords, tokens, certificates\n- Customer personal data (SSN, credit cards, addresses)\n- Financial data, salary information\n- Medical records, HIPAA protected data\n- Legal documents, contracts\n- Internal company strategies, unreleased products\n\n## INTERNAL (Rating 5-7)\n- Employee directories, org charts\n- Internal system screenshots, dashboards\n- Company financial reports (non-public)\n- Internal project timelines, roadmaps\n- Customer lists, business contacts\n\n## RESTRICTED (Rating 3-4)\n- Source code, architecture diagrams\n- Database schemas, system configurations\n- Training materials, internal processes\n- Performance data, metrics\n\n## PUBLIC (Rating 0-2)\n- Marketing materials, public websites\n- Published documentation\n- General business information\n- Public social media content\n"
+            }
+        },
+        "extracted_pages": {
+            "stuff_code": "RDUBi",
+            "stuff_name": "extracted_pages",
+            "concept": {
+                "code": "Text",
+                "domain": "native",
+                "description": "A text",
+                "structure_class_name": "TextContent",
+                "refines": null
+            },
+            "content": {
+                "text": "# praveen287 / gpt-20b-eval\n\nprivate\n\nText Generation \ud83e\udd17 Transformers \u26a1 Safetensors \ud83c\udf10 English gpt_oss \ud83d\udc8e text-generation-inference \ud83e\udde8 unsloth conve\n\n\ud83c\udff7\ufe0f Model card \ud83d\udccb Files and versions \u2694\ufe0f xet \ud83e\udd1d Community \u2699\ufe0f Settings\n\n\u270f\ufe0f Edit model card\n\nploaded finetuned model\n\n\u2022 Developed by: praveen287\n\n\u2022 License: apache-2.0\n\n\u2022 Finetuned from model : unsloth/gpt-oss-20b-BF16\n\nThis gpt_oss model was trained 2x faster with Unsloth and Huggingface's TRL library.\n\n[Unsloth logo with text \"made with unsloth\"]"
+            }
+        },
+        "content_analysis": {
+            "stuff_code": "YzXKf",
+            "stuff_name": "content_analysis",
+            "concept": {
+                "code": "ContentAnalysis",
+                "domain": "image_sensitivity_assessment",
+                "description": "Description of the information and elements identified within visual or textual content.",
+                "structure_class_name": "TextContent",
+                "refines": "native.Text"
+            },
+            "content": {
+                "text": "# Content Analysis: Hugging Face Model Repository Page\n\n## Overall Context and Subject Matter\nThis image shows a Hugging Face model repository page for a fine-tuned GPT model. It represents a machine learning model hosting page where developers share trained AI models. The page belongs to user \"praveen287\" and showcases a private text generation model called \"gpt-20b-eval.\"\n\n## Key Textual Elements and Their Significance\n\n### Header Information\n- **Model Name**: \"praveen287 / gpt-20b-eval\" - Indicates the owner and model identifier\n- **Privacy Status**: \"private\" badge - Shows this model is not publicly accessible\n- **Model Type**: \"Text Generation\" - Identifies the primary task/capability\n\n### Technical Tags/Labels\nMultiple technology and framework indicators are displayed as badges:\n- **\ud83e\udd17 Transformers** - Uses Hugging Face's Transformers library\n- **\u26a1 Safetensors** - Employs the Safetensors format for secure model storage\n- **\ud83c\udf10 English** - Model operates in English language\n- **gpt_oss** - Architecture type\n- **\ud83d\udc8e text-generation-inference** - Optimized for inference\n- **\ud83e\udde8 unsloth** - Training optimization framework used\n- **conve** - Additional tag (partially visible)\n\n### Model Metadata\nThree critical pieces of information are prominently displayed:\n1. **Developed by**: praveen287 - Creator attribution\n2. **License**: apache-2.0 - Open-source licensing information\n3. **Finetuned from model**: unsloth/gpt-oss-20b-BF16 - Base model used for fine-tuning\n\n### Performance Claim\n\"This gpt_oss model was trained 2x faster with Unsloth and Huggingface's TRL library\" - Marketing statement highlighting training efficiency\n\n## Visual Elements and Their Purpose\n\n### Navigation Tabs\nFour main navigation options are visible:\n- **\ud83c\udff7\ufe0f Model card** (currently active) - Documentation page\n- **\ud83d\udccb Files and versions** - Access to model files\n- **\u2694\ufe0f xet** - Version control system\n- **\ud83e\udd1d Community** - Discussion and collaboration space\n- **\u2699\ufe0f Settings** - Configuration options\n\n### Branding Element\n**Unsloth Logo**: A circular green badge with a cartoon sloth character and text \"made with unsloth\" - Serves as both attribution and marketing for the Unsloth training framework\n\n### Action Button\n**\u270f\ufe0f Edit model card** - Allows the owner to modify the documentation\n\n## Information Architecture\n\nThe page follows a standard repository structure:\n1. **Identity layer** (top): Owner, model name, privacy status\n2. **Classification layer**: Technical tags and capabilities\n3. **Navigation layer**: Tabs for different sections\n4. **Content layer**: Model card with metadata and description\n5. **Attribution layer**: Branding and tool acknowledgment\n\n## Technical Significance\n\nThis page indicates:\n- A **20 billion parameter** model (inferred from \"20b\" in name)\n- Use of **BF16 precision** (bfloat16) for efficient computation\n- **Fine-tuning approach** rather than training from scratch\n- Integration with **modern ML infrastructure** (Safetensors, TGI)\n- **Performance optimization** focus (Unsloth, 2x faster training claim)\n\nThe content suggests this is a professional machine learning project with attention to modern best practices in model development, storage, and deployment."
+            }
+        },
+        "sensitivity_assessment": {
+            "stuff_code": "JDAHT",
+            "stuff_name": "sensitivity_assessment",
+            "concept": {
+                "code": "SensitivityAssessment",
+                "domain": "image_sensitivity_assessment",
+                "description": "Structured evaluation of information sensitivity based on predefined rules.",
+                "structure_class_name": "SensitivityAssessment",
+                "refines": null
+            },
+            "content": {
+                "classification": "RESTRICTED",
+                "sensitivity_rating": 4,
+                "should_be_deleted": false,
+                "deletion_date": {
+                    "datetime": "2025-12-31 00:00:00.000000",
+                    "tzinfo": "UTC",
+                    "__class__": "datetime",
+                    "__module__": "datetime"
+                },
+                "reasoning": "This content shows a Hugging Face model repository page for a private machine learning model. Key factors in the classification:\n\n1. RESTRICTED elements present:\n   - The model is marked as \"private\" indicating it's not intended for public access\n   - Technical architecture details are visible (model type, framework tags, base model information)\n   - System configuration information (Safetensors format, text-generation-inference setup)\n   - Internal project details (fine-tuning approach, training methodology)\n\n2. Why NOT higher sensitivity:\n   - No API keys, passwords, or authentication credentials visible\n   - No personal data, financial information, or customer data\n   - No proprietary business strategies or unreleased product details beyond the model itself\n   - The Apache 2.0 license suggests eventual public sharing intent\n   - Most technical details are standard ML infrastructure components\n\n3. Why NOT lower sensitivity:\n   - The \"private\" status indicates this is not public information\n   - Model architecture and configuration details could be considered internal intellectual property\n   - The specific fine-tuning approach and base model choices represent internal technical decisions\n\nRating: 4/10 - Falls into RESTRICTED category as it contains internal technical project information and system configurations for a private model, but lacks highly sensitive data that would warrant CONFIDENTIAL or higher INTERNAL classification.\n\nDeletion recommendation: Should not be immediately deleted as this appears to be active project documentation, but should be reviewed annually for relevance."
+            }
+        }
+    },
+    "aliases": {
+        "main_stuff": "sensitivity_assessment"
+    }
+}
