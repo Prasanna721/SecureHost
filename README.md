@@ -1,6 +1,7 @@
 # SecureHost
 
 Enterprise screenshot security monitoring powered by AI.
+<img width="3360" height="1744" alt="Screenshot 2025-10-29 at 9 47 19 PM" src="https://github.com/user-attachments/assets/4aa9e560-00e5-4ec6-8ac0-26248d9a3690" />
 
 ## The Problem
 
