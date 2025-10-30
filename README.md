@@ -37,6 +37,10 @@ scan_image.plx
 # Install dependencies
 npm install && cd client && npm install
 
+# Configure environment
+cp .env.example .env
+# Edit .env with your Cloudinary credentials
+
 # Start both servers
 npm run dev
 ```
@@ -69,7 +73,10 @@ File Watcher → Screenshot Detection → AI Analysis → Database → Dashboard
 
 ## Configuration
 
-Set your Cloudinary credentials in `src/image-uploader.js` for public image hosting (required for AI analysis).
+Copy `.env.example` to `.env` and configure:
+- **Cloudinary credentials** - Required for public image hosting (needed for AI analysis)
+- **API keys** - For Pipelex AI workflows
+- **Server port** - Default 3001
 
 ## Privacy Rules
 

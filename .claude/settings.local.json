@@ -4,7 +4,10 @@
     "allow": [
       "Bash(npx create-react-app:*)",
       "Bash(mkdir:*)",
-      "WebFetch(domain:cloudinary.com)"
+      "WebFetch(domain:cloudinary.com)",
+      "Bash(touch:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm add:*)"
     ],
     "deny": []
   }
